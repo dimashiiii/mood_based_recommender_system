@@ -1,0 +1,3 @@
+[server]
+fileWatcherInclude = ["**/*.py"]
+fileWatcherExclude = ["*/site-packages/torch/*"]

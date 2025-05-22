@@ -5,3 +5,5 @@ opencv-python
 tqdm
 scikit-learn
 ultralytics
+python-dotenv
+gdown

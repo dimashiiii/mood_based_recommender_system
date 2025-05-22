@@ -31,10 +31,11 @@ SPOTIFY_PLAYLISTS = {
 
 @st.cache_resource
 def load_model_and_tokenizer(path):
-    safetensor_path = os.path.join(path, "model.safetensors")
-    config_name = "distilbert-base-uncased"  # или твоя модель
+    import gdown
 
-    # Если model.safetensors не существует — скачать
+    safetensor_path = os.path.join(path, "model.safetensors")
+
+    # Егер safetensors файл жоқ болса — жүктеу
     if not os.path.exists(safetensor_path):
         st.warning("Model file not found. Downloading from Google Drive...")
         os.makedirs(path, exist_ok=True)
@@ -44,17 +45,8 @@ def load_model_and_tokenizer(path):
             quiet=False
         )
 
-    # Загрузить tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(config_name)
-
-    # Загрузить веса из .safetensors
-    state_dict = load_file(safetensor_path)
-
-    # Создать модель и загрузить веса
-    model = AutoModelForSequenceClassification.from_pretrained(
-        config_name,
-        state_dict=state_dict
-    )
+    tokenizer = AutoTokenizer.from_pretrained(path)
+    model = AutoModelForSequenceClassification.from_pretrained(path)
 
     return tokenizer, model
 

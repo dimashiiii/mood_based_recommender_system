@@ -6,6 +6,8 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyClientCredentials
 import streamlit.components.v1 as components
+import gdown
+from safetensors.torch import load_file
 
 load_dotenv()
 
@@ -29,8 +31,31 @@ SPOTIFY_PLAYLISTS = {
 
 @st.cache_resource
 def load_model_and_tokenizer(path):
-    tokenizer = AutoTokenizer.from_pretrained(path)
-    model     = AutoModelForSequenceClassification.from_pretrained(path)
+    safetensor_path = os.path.join(path, "model.safetensors")
+    config_name = "distilbert-base-uncased"  # или твоя модель
+
+    # Если model.safetensors не существует — скачать
+    if not os.path.exists(safetensor_path):
+        st.warning("Model file not found. Downloading from Google Drive...")
+        os.makedirs(path, exist_ok=True)
+        gdown.download(
+            url="https://drive.google.com/uc?id=1m0ByQMvmZswCwajlVdfRBWDBVY9ISJo_",
+            output=safetensor_path,
+            quiet=False
+        )
+
+    # Загрузить tokenizer
+    tokenizer = AutoTokenizer.from_pretrained(config_name)
+
+    # Загрузить веса из .safetensors
+    state_dict = load_file(safetensor_path)
+
+    # Создать модель и загрузить веса
+    model = AutoModelForSequenceClassification.from_pretrained(
+        config_name,
+        state_dict=state_dict
+    )
+
     return tokenizer, model
 
 tokenizer, model = load_model_and_tokenizer(MODEL_PATH)

@@ -7,3 +7,5 @@ scikit-learn
 ultralytics
 python-dotenv
 gdown
+transformers
+torch
